@@ -91,11 +91,13 @@ export default class {
     // Parsing img
     text = text.replace(/\[IMG]([^]+?)\[\/IMG]/gim, "!($1)")
     // Parsing link
-    return text.replace(/\[URL=?([^]*?)]([^]+?)\[\/URL]/gim, (_, url, title) => url ? `![${title}](${url})` : `![](${title})`)
+    text = text.replace(/\[URL=?([^]*?)]([^]+?)\[\/URL]/gim, (_, url, title) => url ? `![${title}](${url})` : `![](${title})`)
+    // Parsing spoiler
+    return text.replace(/\[SPOILER=?([^]*?)]([^]+?)\[\/SPOILER]/gim, "~~~$1\n$2\n~~~")
   }
 
   MD2BB (text) {
-    const basicSyntaxReplace = (text, bb, md, exclude="") => text.replace(new RegExp(`${md}([^${exclude}]+?)${md}`, "gim"), `[${bb}]$1[/${bb}]`)
+    const basicSyntaxReplace = (text, bb, md, exclude="") => text.replace(new RegExp(`${md}([^${exclude}]+?)${md}`, "gm"), `[${bb}]$1[/${bb}]`)
     // Parsing bold
     text = basicSyntaxReplace(text, "B", "\\*\\*")
     // Parsing italic
@@ -105,13 +107,15 @@ export default class {
     // Parsing line through
     text = basicSyntaxReplace(text, "S", "--")
     // Parsing highlighted code
-    text = text.replace(/`{3}([^]*?)\n([^]+?)`{3}/gim, "[CODE=$1]$2[/CODE]")
+    text = text.replace(/`{3}([^]*?)\n([^]+?)`{3}/gm, "[CODE=$1]$2[/CODE]")
     // Parsing simple code
     text = basicSyntaxReplace(text, "CODE", "`", "`")
     // Parsing img
-    text = text.replace(/!\(([^]+?)\)/gim, "[IMG]$1[/IMG]")
+    text = text.replace(/!\(([^]+?)\)/gm, "[IMG]$1[/IMG]")
     // Parsing link
-    return text.replace(/!\[([^]*?)]\(([^]+?)\)/gim, (_, title, url) => title ? `[URL=${url}]${title}[/URL]` : `[URL]${url}[/URL]`)
+    text = text.replace(/!\[([^]*?)]\(([^]+?)\)/gm, (_, title, url) => title ? `[URL=${url}]${title}[/URL]` : `[URL]${url}[/URL]`)
+    // Parsing spoiler
+    return text.replace(/~~~([^]*?)\n([^]+?)~~~/gm, (_, title, content) => `[SPOILER${title ? `=${title}` : ""}]${content}[/SPOILER]`)
   }
 
   destroy () {
