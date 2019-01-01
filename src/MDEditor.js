@@ -87,13 +87,15 @@ export default class {
     // Parsing simple code
     text = basicSyntaxReplace(text, "CODE", "`")
     // Parsing highlighted code
-    text = text.replace(/\[CODE=([^]+?)]([^]+?)\[\/CODE]/gim, "```$1\n$2\n```")
+    text = text.replace(/\[CODE=([^]+?)]([^]+?)\[\/CODE]/gim, "```$1\n$2```")
     // Parsing img
     text = text.replace(/\[IMG]([^]+?)\[\/IMG]/gim, "!($1)")
     // Parsing link
     text = text.replace(/\[URL=?([^]*?)]([^]+?)\[\/URL]/gim, (_, url, title) => url ? `![${title}](${url})` : `![](${title})`)
     // Parsing spoiler
-    return text.replace(/\[SPOILER=?([^]*?)]([^]+?)\[\/SPOILER]/gim, "~~~$1\n$2\n~~~")
+    text = text.replace(/\[SPOILER=?([^]*?)]([^]+?)\[\/SPOILER]/gim, "~~~$1\n$2~~~")
+    // Parsing media
+    return text.replace(/\[MEDIA=([^]+?)]([^]+?)\[\/MEDIA]/gim, "M[$1]($2)")
   }
 
   MD2BB (text) {
@@ -115,7 +117,9 @@ export default class {
     // Parsing link
     text = text.replace(/!\[([^]*?)]\(([^]+?)\)/gm, (_, title, url) => title ? `[URL=${url}]${title}[/URL]` : `[URL]${url}[/URL]`)
     // Parsing spoiler
-    return text.replace(/~~~([^]*?)\n([^]+?)~~~/gm, (_, title, content) => `[SPOILER${title ? `=${title}` : ""}]${content}[/SPOILER]`)
+    text =  text.replace(/~~~([^]*?)\n([^]+?)~~~/gm, (_, title, content) => `[SPOILER${title ? `=${title}` : ""}]${content}[/SPOILER]`)
+    // Parsing media
+    return text.replace(/[MmМм]\[([^]+?)]\(([^]+?)\)/gim, "[MEDIA=$1]$2[/MEDIA]")
   }
 
   destroy () {
