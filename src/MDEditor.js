@@ -95,7 +95,7 @@ export default class {
   }
 
   MD2BB (text) {
-    const basicSyntaxReplace = (text, bb, md) => text.replace(new RegExp(`${md}([^]+?)${md}`, "gim"), `[${bb}]$1[/${bb}]`)
+    const basicSyntaxReplace = (text, bb, md, exclude="") => text.replace(new RegExp(`${md}([^${exclude}]+?)${md}`, "gim"), `[${bb}]$1[/${bb}]`)
     // Parsing bold
     text = basicSyntaxReplace(text, "B", "\\*\\*")
     // Parsing italic
@@ -104,10 +104,10 @@ export default class {
     text = basicSyntaxReplace(text, "U", "__")
     // Parsing line through
     text = basicSyntaxReplace(text, "S", "--")
-    // Parsing simple code
-    text = basicSyntaxReplace(text, "CODE", "`")
     // Parsing highlighted code
     text = text.replace(/`{3}([^]*?)\n([^]+?)`{3}/gim, "[CODE=$1]$2[/CODE]")
+    // Parsing simple code
+    text = basicSyntaxReplace(text, "CODE", "`", "`")
     // Parsing img
     text = text.replace(/!\(([^]+?)\)/gim, "[IMG]$1[/IMG]")
     // Parsing link
