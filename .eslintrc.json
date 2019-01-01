@@ -1,0 +1,20 @@
+{
+  "parser": "babel-eslint",
+  "parserOptions": {
+    "ecmaVersion": 6,
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "impliedStrict": true
+    }
+  },
+  "rules": {
+    "space-in-parens": ["error", "never"],
+    "space-before-function-paren": ["error", "always"],
+    "curly": "off",
+    "eqeqeq": "error",
+    "padded-blocks": "off",
+    "no-multiple-empty-lines": "warn",
+    "semi": ["warn", "never"],
+    "no-debugger": "warn"
+  }
+}
