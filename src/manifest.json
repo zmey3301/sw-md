@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "SmartsWorld MD",
-  "version": "0.1",
+  "version": "0.2.0",
   "description": "Markdown компилятор для форума SmartsWorld",
   "icons": {
     "32": "icons/32.png",

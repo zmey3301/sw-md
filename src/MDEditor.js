@@ -53,6 +53,7 @@ export default class {
 
     this.#bbTextarea = node.querySelector(this.#bbTextareaSelector)
     if (!this.#bbTextarea) this.#observer.observe(inputWrapper, {childList: true})
+    else this.#observer.observe(this.#bbTextarea, {attributes: true, attributeFilter: ["disabled", "style"]})
   }
 
   get editorOpened () {
@@ -60,6 +61,7 @@ export default class {
   }
 
   set editorOpened (newValue) {
+    console.log("open", newValue)
     this.#opened = newValue
     this.#button.classList.toggle("_active", newValue)
     this.#bbModeButton.classList.toggle("mde-hard-disable", newValue)
