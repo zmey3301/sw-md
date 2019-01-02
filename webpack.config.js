@@ -1,6 +1,8 @@
 const path = require('path')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const CRX = require('crx-webpack-plugin')
+const manifest = require('./src/manifest')
 module.exports = (env, argv) => {
   const dist = path.resolve(__dirname,  argv.mode === 'production' ? 'dist' : 'dev')
   const filename = 'index.js'
@@ -8,7 +10,7 @@ module.exports = (env, argv) => {
     './src/assets/sass/style.sass'
   ]
   const styleFilenames = sassFiles.map(file => path.basename(file, '.sass') + '.css')
-  return {
+  let config = {
     entry: ['./src/index.js', ...sassFiles],
     watch: argv.mode !== 'production',
     devtool: argv.mode === 'production' ? 'none' : 'cheap-module-eval-source-map',
@@ -68,5 +70,12 @@ module.exports = (env, argv) => {
       })
     ]
   }
+  if (argv.mode === 'production') config.plugins.push(new CRX({
+    keyFile: 'cert.pem',
+    contentPath: 'dist',
+    outputPath: 'chrome',
+    name: manifest.name.toLowerCase().replace(/\s/g, "-")
+  }))
+  return config
 }
 
