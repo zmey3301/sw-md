@@ -2,16 +2,14 @@ const path = require('path')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const CRX = require('crx-webpack-plugin')
-const manifest = require('./src/manifest')
+const ZIP = require('zip-webpack-plugin')
+const pkg = require('./package')
 module.exports = (env, argv) => {
   const dist = path.resolve(__dirname,  argv.mode === 'production' ? 'dist' : 'dev')
+  const bundle = path.resolve(__dirname, 'bundle')
   const filename = 'index.js'
-  const sassFiles = [
-    './src/assets/sass/style.sass'
-  ]
-  const styleFilenames = sassFiles.map(file => path.basename(file, '.sass') + '.css')
   let config = {
-    entry: ['./src/index.js', ...sassFiles],
+    entry: ['./src/index.js', './src/assets/sass/style.sass'],
     watch: argv.mode !== 'production',
     devtool: argv.mode === 'production' ? 'none' : 'cheap-module-eval-source-map',
     output: {
@@ -59,8 +57,10 @@ module.exports = (env, argv) => {
           from: path.resolve(__dirname, 'src', 'manifest.json'),
           transform (content) {
             content = JSON.parse(content.toString())
+            content.version = pkg.version
+            if (typeof content.content_scripts === "undefined") content.content_scripts = [{}]
             content.content_scripts[0].js = [filename]
-            content.content_scripts[0].css = styleFilenames
+            content.content_scripts[0].css = ['style.css']
             return JSON.stringify(content)
           }
         }
@@ -70,12 +70,21 @@ module.exports = (env, argv) => {
       })
     ]
   }
-  if (argv.mode === 'production') config.plugins.push(new CRX({
-    keyFile: 'cert.pem',
-    contentPath: 'dist',
-    outputPath: 'chrome',
-    name: manifest.name.toLowerCase().replace(/\s/g, "-")
-  }))
+  console.log(process.env)
+  if (argv.mode === 'production') {
+    config.plugins.push(...[
+      new ZIP({
+        path: bundle,
+        filename: `${pkg.name}.zip`
+      }),
+      new CRX({
+        keyFile: path.join(process.env.HOME, `${pkg.name}.pem`),
+        contentPath: 'dist',
+        outputPath: path.resolve(bundle, 'chrome'),
+        name: pkg.name
+      })
+    ])
+  }
   return config
 }
 

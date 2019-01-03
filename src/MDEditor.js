@@ -96,8 +96,20 @@ export default class {
     this.#bbTextarea.value = this.MD2BB(this.#mdTextarea.value)
   }, 300)
 
+  escape (escape, string, type) {
+    const patterns = {
+      md: "\\*{2}|(?<!\\*)\\*(?!\\*)|_{2}|-{2}|<{2}|>{2}|\\^{2}|`{3}|(?<!`)`(?!`)|~{3}|[MmМм!]\\[]\\(\\)|!\\(\\)|#{1,7}",
+      bb: "\\[(?:B|I|U|S|LEFT|RIGHT|CENTER|IMG|MEDIA|CODE|URL|SIZE|SPOILER)=?[^]*?]"
+    }
+    return string.replace(new RegExp(`(${escape ? "?<!\\\\)(" : "\\\\"}(?:${patterns[type]}))`, "gim"), match => escape ? `\\${match}` : match.substring(1))
+  }
+
   BB2MD (text) {
-    const basicSyntaxReplace = (text, bb, md) => text.replace(new RegExp(`\\[${bb}]([^]+?)\\[\/${bb}]`, "gim"), `${md}$1${md}`)
+    const basicSyntaxReplace = (text, bb, md) => text.replace(new RegExp(`(?<!\\\\)\\[${bb}]([^]+?)\\[\/${bb}]`, "gim"), `${md}$1${md}`)
+    // Parsing code
+    text = text
+      .replace(/(?<!\\)\[CODE=([^]+?)]([^]+?)\[\/CODE]/gim, (_, mode, code) => `\`\`\`${mode}\n${mode.toLowerCase() !== "rich" ? this.escape(true, code, "bb") : code}\`\`\``)
+      .replace(/(?<!\\)\[CODE]([^]+?)\[\/CODE]/gim, (_, code) => `\`${this.escape(true, code, "bb")}\``)
     // Parsing bold
     text = basicSyntaxReplace(text, "B", "**")
     // Parsing italic
@@ -112,48 +124,50 @@ export default class {
     text = basicSyntaxReplace(text, "RIGHT", ">>")
     // Parsing align center
     text = basicSyntaxReplace(text, "CENTER", "^^")
-    // Parsing highlighted code
-    text = text.replace(/\[CODE=([^]+?)]([^]+?)\[\/CODE]/gim, "```$1\n$2```")
-    // Parsing simple code
-    text = basicSyntaxReplace(text, "CODE", "`")
     // Parsing img
-    text = text.replace(/\[IMG]([^]+?)\[\/IMG]/gim, "!($1)")
+    text = text.replace(/(?<!\\)\[IMG]([^]+?)\[\/IMG]/gim, "!($1)")
     // Parsing link
-    text = text.replace(/\[URL=?([^]*?)]([^]+?)\[\/URL]/gim, (_, url, title) => url ? `![${title}](${url})` : `![](${title})`)
+      .replace(/(?<!\\)\[URL=?([^]*?)]([^]+?)\[\/URL]/gim, (_, url, title) => url ? `![${title}](${url})` : `![](${title})`)
     // Parsing spoiler
-    text = text.replace(/\[SPOILER=?([^]*?)]([^]+?)\[\/SPOILER]/gim, "~~~$1\n$2~~~")
+      .replace(/(?<!\\)\[SPOILER=?([^]*?)]([^]+?)\[\/SPOILER]/gim, "~~~$1\n$2~~~")
     // Parsing media
-    return text.replace(/\[MEDIA=([^]+?)]([^]+?)\[\/MEDIA]/gim, "M[$1]($2)")
+      .replace(/(?<!\\)\[MEDIA=([^]+?)]([^]+?)\[\/MEDIA]/gim, "M[$1]($2)")
+    return this.escape(false, text, "bb")
   }
 
   MD2BB (text) {
-    const basicSyntaxReplace = (text, bb, md, exclude="") => text.replace(new RegExp(`${md}([^${exclude}]+?)${md}`, "gm"), `[${bb}]$1[/${bb}]`)
-    // Parsing bold
-    text = basicSyntaxReplace(text, "B", "\\*\\*")
-    // Parsing italic
-    text = basicSyntaxReplace(text, "I", "\\*")
-    // Parsing underlined
-    text = basicSyntaxReplace(text, "U", "__")
-    // Parsing line through
-    text = basicSyntaxReplace(text, "S", "--")
-    // Parsing align left
-    text = basicSyntaxReplace(text, "LEFT", "<<")
-    // Parsing align right
-    text = basicSyntaxReplace(text, "RIGHT", ">>")
-    // Parsing align center
-    text = basicSyntaxReplace(text, "CENTER", "\\^\\^")
-    // Parsing highlighted code
-    text = text.replace(/`{3}([^]*?)\n([^]+?)`{3}/gm, "[CODE=$1]$2[/CODE]")
+    const basicSyntaxReplace = (text, bb, md) => text.replace(new RegExp(`(?<!\\\\)${md}([^]+?)(?<!\\\\)${md}`, "gm"), `[${bb}]$1[/${bb}]`)
+    // Parsing code
+    text = text
+      .replace(/(?<!\\)`{3}([^]*?)\n([^]+?)(?<!\\)`{3}/gm, (_, mode, code) => `[CODE=${mode}]${mode.toLowerCase() !== "rich" ? this.escape(true, code, "md") : code}[/CODE]`)
+      .replace(/(?<![\\`])`(?!`)([^]+?)(?<!\\)(?<![\\`])`(?!`)/gm, (_, code) => `[CODE]${this.escape(true, code, "md")}[/CODE]`)
+    console.log(text)
     // Parsing simple code
-    text = basicSyntaxReplace(text, "CODE", "`", "`")
+    text = basicSyntaxReplace(text, "CODE", "(?<!`)`(?!`)")
+    // Parsing bold
+    text = basicSyntaxReplace(text, "B", "\\*{2}")
+    // Parsing italic
+    text = basicSyntaxReplace(text, "I", "(?<!\\*)\\*(?!\\*)")
+    // Parsing underlined
+    text = basicSyntaxReplace(text, "U", "_{2}")
+    // Parsing line through
+    text = basicSyntaxReplace(text, "S", "-{2}")
+    // Parsing align left
+    text = basicSyntaxReplace(text, "LEFT", "<{2}")
+    // Parsing align right
+    text = basicSyntaxReplace(text, "RIGHT", ">{2}")
+    // Parsing align center
+    text = basicSyntaxReplace(text, "CENTER", "\\^{2}")
     // Parsing img
-    text = text.replace(/!\(([^]+?)\)/gm, "[IMG]$1[/IMG]")
+    text = text
+      .replace(/(?<!\\)!\(([^]+?)\)/gm, "[IMG]$1[/IMG]")
     // Parsing link
-    text = text.replace(/!\[([^]*?)]\(([^]+?)\)/gm, (_, title, url) => title ? `[URL=${url}]${title}[/URL]` : `[URL]${url}[/URL]`)
+      .replace(/(?<!\\)!\[([^]*?)]\(([^]+?)\)/gm, (_, title, url) => title ? `[URL=${url}]${title}[/URL]` : `[URL]${url}[/URL]`)
     // Parsing spoiler
-    text =  text.replace(/~~~([^]*?)\n([^]+?)~~~/gm, (_, title, content) => `[SPOILER${title ? `=${title}` : ""}]${content}[/SPOILER]`)
+      .replace(/(?<!\\)~{3}([^]*?)\n([^]+?)(?<!\\)~{3}/gm, (_, title, content) => `[SPOILER${title ? `=${title}` : ""}]${content}[/SPOILER]`)
     // Parsing media
-    return text.replace(/[MmМм]\[([^]+?)]\(([^]+?)\)/gim, "[MEDIA=$1]$2[/MEDIA]")
+      .replace(/(?<!\\)[MmМм]\[([^]+?)]\(([^]+?)\)/gm, "[MEDIA=$1]$2[/MEDIA]")
+    return this.escape(false, text, "md")
   }
 
   destroy () {
