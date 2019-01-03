@@ -1,6 +1,7 @@
 const path = require('path')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const DropConsolePlugin = require('drop-console-webpack-plugin')
 const CRX = require('crx-webpack-plugin')
 const ZIP = require('zip-webpack-plugin')
 const pkg = require('./package')
@@ -72,6 +73,7 @@ module.exports = (env, argv) => {
   }
   if (argv.mode === 'production') {
     config.plugins.push(...[
+      new DropConsolePlugin(),
       new ZIP({
         path: bundle,
         filename: `${pkg.name}.zip`

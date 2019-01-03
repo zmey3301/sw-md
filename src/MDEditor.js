@@ -132,6 +132,8 @@ export default class {
       .replace(/(?<!\\)\[SPOILER=?([^]*?)]([^]+?)\[\/SPOILER]/gim, "~~~$1\n$2~~~")
     // Parsing media
       .replace(/(?<!\\)\[MEDIA=([^]+?)]([^]+?)\[\/MEDIA]/gim, "M[$1]($2)")
+    // Parsing header
+      .replace(/^\s*(?<!\\)\[SIZE=([1-7])]([^]+?)\[\/SIZE]\s*$/gim, (_, size, content) => `${Array(8 - Number(size)).fill("#").join("")} ${content}`)
     return this.escape(false, text, "bb")
   }
 
@@ -139,9 +141,8 @@ export default class {
     const basicSyntaxReplace = (text, bb, md) => text.replace(new RegExp(`(?<!\\\\)${md}([^]+?)(?<!\\\\)${md}`, "gm"), `[${bb}]$1[/${bb}]`)
     // Parsing code
     text = text
-      .replace(/(?<!\\)`{3}([^]*?)\n([^]+?)(?<!\\)`{3}/gm, (_, mode, code) => `[CODE=${mode}]${mode.toLowerCase() !== "rich" ? this.escape(true, code, "md") : code}[/CODE]`)
+      .replace(/(?<!\\)`{3}([^]+?)\n([^]+?)(?<!\\)`{3}/gm, (_, mode, code) => `[CODE=${mode}]${mode.toLowerCase() !== "rich" ? this.escape(true, code, "md") : code}[/CODE]`)
       .replace(/(?<![\\`])`(?!`)([^]+?)(?<!\\)(?<![\\`])`(?!`)/gm, (_, code) => `[CODE]${this.escape(true, code, "md")}[/CODE]`)
-    console.log(text)
     // Parsing simple code
     text = basicSyntaxReplace(text, "CODE", "(?<!`)`(?!`)")
     // Parsing bold
@@ -167,6 +168,8 @@ export default class {
       .replace(/(?<!\\)~{3}([^]*?)\n([^]+?)(?<!\\)~{3}/gm, (_, title, content) => `[SPOILER${title ? `=${title}` : ""}]${content}[/SPOILER]`)
     // Parsing media
       .replace(/(?<!\\)[MmМм]\[([^]+?)]\(([^]+?)\)/gm, "[MEDIA=$1]$2[/MEDIA]")
+    // Parsing head
+      .replace(/^\s*(?<!\\)([#]{1,7})\s?([^]+?)\s*$/gm, (_, prefix, content) => `[SIZE=${8 - prefix.length}]${content}[/SIZE]`)
     return this.escape(false, text, "md")
   }
 
