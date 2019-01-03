@@ -1738,10 +1738,9 @@ cross-spawn@^6.0.0, cross-spawn@^6.0.5:
     shebang-command "^1.2.0"
     which "^1.2.9"
 
-crx-webpack-plugin@^0.1.5:
+crx-webpack-plugin@zmey3301/crx-webpack-plugin:
   version "0.1.5"
-  resolved "https://registry.yarnpkg.com/crx-webpack-plugin/-/crx-webpack-plugin-0.1.5.tgz#847a8022098fb36bf2f8f440c1e5a8419f6d1865"
-  integrity sha1-hHqAIgmPs2vy+PRAweWoQZ9tGGU=
+  resolved "https://codeload.github.com/zmey3301/crx-webpack-plugin/tar.gz/0d708378b788d1a0c9888af6b136efe90739d038"
   dependencies:
     crx "~3.2.1"
     mkdirp "~0.5.0"

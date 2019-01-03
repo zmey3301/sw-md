@@ -23,7 +23,7 @@
     "babel-loader": "^8.0.4",
     "copy-webpack-plugin": "^4.6.0",
     "core-js": "^2.6.1",
-    "crx-webpack-plugin": "^0.1.5",
+    "crx-webpack-plugin": "zmey3301/crx-webpack-plugin",
     "css-loader": "^2.1.0",
     "eslint": "^5.11.1",
     "eslint-cli": "^1.1.1",

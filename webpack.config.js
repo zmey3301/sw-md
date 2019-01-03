@@ -70,7 +70,6 @@ module.exports = (env, argv) => {
       })
     ]
   }
-  console.log(process.env)
   if (argv.mode === 'production') {
     config.plugins.push(...[
       new ZIP({
