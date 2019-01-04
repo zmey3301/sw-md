@@ -98,7 +98,7 @@ export default class {
 
   escape (escape, string, type) {
     const patterns = {
-      md: "\\*{2}|(?<!\\*)\\*(?!\\*)|_{2}|-{2}|<{2}|>{2}|\\^{2}|`{3}|(?<!`)`(?!`)|~{3}|[MmМм!]\\[[^]*?]\\([^]+?\\)|!\\([^]+?\\)|#{1,7}",
+      md: "\\*{2}|(?<![\\*\\[])\\*(?![\\*\\]])|_{2}|-{2}|<{2}|>{2}|\\^{2}|`{3}|(?<!`)`(?!`)|~{3}|[MmМм!]\\[[^]*?]\\([^]+?\\)|!\\([^]+?\\)|#{1,7}",
       bb: "\\[(?:B|I|U|S|LEFT|RIGHT|CENTER|IMG|MEDIA|CODE|URL|SIZE|SPOILER)=?[^]*?]"
     }
     return string.replace(new RegExp(`(${escape ? "?<!\\\\)(" : "\\\\"}(?:${patterns[type]}))`, "gim"), match => escape ? `\\${match}` : match.replace(/^\\+/, ""))
@@ -146,7 +146,7 @@ export default class {
     // Parsing bold
     text = basicSyntaxReplace(text, "B", "\\*{2}")
     // Parsing italic
-    text = basicSyntaxReplace(text, "I", "(?<!\\*)\\*(?!\\*)")
+    text = basicSyntaxReplace(text, "I", "(?<![\\*\\[])\\*(?![\\*\\]])")
     // Parsing underlined
     text = basicSyntaxReplace(text, "U", "_{2}")
     // Parsing line through
