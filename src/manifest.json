@@ -7,7 +7,7 @@
     "128": "icons/128.png"
   },
   "content_scripts": [{
-    "matches": ["*://forum.smartsworld.ru/view/*", "*://forum.smartsworld.ru/conversations/*"]
+    "matches": ["*://forum.smartsworld.ru/view/*", "*://forum.smartsworld.ru/conversations/*", "*://forum.smartsworld.ru/pages/*"]
   }],
   "permissions": [
     "activeTab",
