@@ -108,7 +108,7 @@ export default class {
     const basicSyntaxReplace = (text, bb, md) => text.replace(new RegExp(`(?<!\\\\)\\[${bb}]([^]+?)\\[\/${bb}]`, "gim"), `${md}$1${md}`)
     // Parsing code
     text = text
-      .replace(/(?<!\\)\[CODE=([^]+?)]([^]+?)\[\/CODE]/gim, (_, mode, code) => `\`\`\`${mode}\n${mode.toLowerCase() !== "rich" ? this.escape(true, code, "bb") : code}\`\`\``)
+      .replace(/(?<!\\)\[CODE=([^]+?)]\n?([^]+?)\[\/CODE]/gim, (_, mode, code) => `\`\`\`${mode}\n${mode.toLowerCase() !== "rich" ? this.escape(true, code, "bb") : code}\`\`\``)
       .replace(/(?<!\\)\[CODE]([^]+?)\[\/CODE]/gim, (_, code) => `\`${this.escape(true, code, "bb")}\``)
     // Parsing bold
     text = basicSyntaxReplace(text, "B", "**")
@@ -129,7 +129,7 @@ export default class {
     // Parsing link
       .replace(/(?<!\\)\[URL=?([^]*?)]([^]+?)\[\/URL]/gim, (_, url, title) => url ? `![${title}](${url})` : `![](${title})`)
     // Parsing spoiler
-      .replace(/(?<!\\)\[SPOILER=?([^]*?)]([^]+?)\[\/SPOILER]/gim, "~~~$1\n$2~~~")
+      .replace(/(?<!\\)\[SPOILER=?([^]*?)]\n?([^]+?)\[\/SPOILER]/gim, "~~~$1\n$2~~~")
     // Parsing media
       .replace(/(?<!\\)\[MEDIA=([^]+?)]([^]+?)\[\/MEDIA]/gim, "M[$1]($2)")
     // Parsing header
@@ -141,7 +141,7 @@ export default class {
     const basicSyntaxReplace = (text, bb, md) => text.replace(new RegExp(`(?<!\\\\)${md}([^]+?)(?<!\\\\)${md}`, "gm"), `[${bb}]$1[/${bb}]`)
     // Parsing code
     text = text
-      .replace(/(?<!\\)`{3}([^]+?)\n([^]+?)(?<!\\)`{3}/gm, (_, mode, code) => `[CODE=${mode}]${mode.toLowerCase() !== "rich" ? this.escape(true, code, "md") : code}[/CODE]`)
+      .replace(/(?<!\\)`{3}([^]+?)\n([^]+?)(?<!\\)`{3}/gm, (_, mode, code) => `[CODE=${mode}]\n${mode.toLowerCase() !== "rich" ? this.escape(true, code, "md") : code}[/CODE]`)
       .replace(/(?<![\\`])`(?!`)([^]+?)(?<!\\)(?<![\\`])`(?!`)/gm, (_, code) => `[CODE]${this.escape(true, code, "md")}[/CODE]`)
     // Parsing bold
     text = basicSyntaxReplace(text, "B", "\\*{2}")
@@ -163,7 +163,7 @@ export default class {
     // Parsing link
       .replace(/(?<!\\)!\[([^]*?)]\(([^]+?)\)/gm, (_, title, url) => title ? `[URL=${url}]${title}[/URL]` : `[URL]${url}[/URL]`)
     // Parsing spoiler
-      .replace(/(?<!\\)~{3}([^]*?)\n([^]+?)(?<!\\)~{3}/gm, (_, title, content) => `[SPOILER${title ? `=${title}` : ""}]${content}[/SPOILER]`)
+      .replace(/(?<!\\)~{3}([^]*?)\n([^]+?)(?<!\\)~{3}/gm, (_, title, content) => `[SPOILER${title ? `=${title}` : ""}]\n${content}[/SPOILER]`)
     // Parsing media
       .replace(/(?<!\\)[MmМм]\[([^]+?)]\(([^]+?)\)/gm, "[MEDIA=$1]$2[/MEDIA]")
     // Parsing head
