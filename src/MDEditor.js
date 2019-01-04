@@ -142,7 +142,7 @@ export default class {
     // Parsing code
     text = text
       .replace(/(?<!\\)`{3}([^]+?)\n([^]+?)(?<!\\)`{3}/gm, (_, mode, code) => `[CODE=${mode}]\n${mode.toLowerCase() !== "rich" ? this.escape(true, code, "md") : code}[/CODE]`)
-      .replace(/(?<![\\`])`(?!`)([^]+?)(?<!\\)(?<![\\`])`(?!`)/gm, (_, code) => `[CODE]${this.escape(true, code, "md")}[/CODE]`)
+      .replace(/(?<![\\`])`(?!`)([^]+?)(?<![\\`])`(?!`)/gm, (_, code) => `[CODE]${this.escape(true, code, "md")}[/CODE]`)
     // Parsing bold
     text = basicSyntaxReplace(text, "B", "\\*{2}")
     // Parsing italic
