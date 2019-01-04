@@ -98,10 +98,10 @@ export default class {
 
   escape (escape, string, type) {
     const patterns = {
-      md: "\\*{2}|(?<!\\*)\\*(?!\\*)|_{2}|-{2}|<{2}|>{2}|\\^{2}|`{3}|(?<!`)`(?!`)|~{3}|[MmМм!]\\[]\\(\\)|!\\(\\)|#{1,7}",
+      md: "\\*{2}|(?<!\\*)\\*(?!\\*)|_{2}|-{2}|<{2}|>{2}|\\^{2}|`{3}|(?<!`)`(?!`)|~{3}|[MmМм!]\\[[^]*?]\\([^]+?\\)|!\\([^]+?\\)|#{1,7}",
       bb: "\\[(?:B|I|U|S|LEFT|RIGHT|CENTER|IMG|MEDIA|CODE|URL|SIZE|SPOILER)=?[^]*?]"
     }
-    return string.replace(new RegExp(`(${escape ? "?<!\\\\)(" : "\\\\"}(?:${patterns[type]}))`, "gim"), match => escape ? `\\${match}` : match.substring(1))
+    return string.replace(new RegExp(`(${escape ? "?<!\\\\)(" : "\\\\"}(?:${patterns[type]}))`, "gim"), match => escape ? `\\${match}` : match.replace(/^\\+/, ""))
   }
 
   BB2MD (text) {
@@ -143,8 +143,6 @@ export default class {
     text = text
       .replace(/(?<!\\)`{3}([^]+?)\n([^]+?)(?<!\\)`{3}/gm, (_, mode, code) => `[CODE=${mode}]${mode.toLowerCase() !== "rich" ? this.escape(true, code, "md") : code}[/CODE]`)
       .replace(/(?<![\\`])`(?!`)([^]+?)(?<!\\)(?<![\\`])`(?!`)/gm, (_, code) => `[CODE]${this.escape(true, code, "md")}[/CODE]`)
-    // Parsing simple code
-    text = basicSyntaxReplace(text, "CODE", "(?<!`)`(?!`)")
     // Parsing bold
     text = basicSyntaxReplace(text, "B", "\\*{2}")
     // Parsing italic
