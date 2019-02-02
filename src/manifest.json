@@ -9,8 +9,9 @@
   "content_scripts": [{
     "matches": ["*://forum.smartsworld.ru/view/*", "*://forum.smartsworld.ru/conversations/*", "*://forum.smartsworld.ru/pages/*"]
   }],
-  "permissions": [
-    "activeTab",
-    "declarativeContent"
-  ]
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "{da4bb08b-1772-4a2f-acf9-098477cb5c8b}"
+    }
+  }
 }

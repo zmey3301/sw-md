@@ -14,7 +14,6 @@ function pageObserver () {
         else
           window.MDEditors[mutation.target.getAttribute("data-md-editor")]?.destroy()
       } else if (mutation.type === "childList") {
-        console.log(mutation)
         if (mutation.target.matches(messageContainerSelector)) {
           for (const node of mutation.addedNodes)
             observeMessage(node)
