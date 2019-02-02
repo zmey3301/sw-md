@@ -8,6 +8,7 @@
   "private": false,
   "scripts": {
     "dev": "webpack --mode development --progress",
+    "firefox-dev": "web-ext run --firefox=firefox-developer-edition --bc --url https://forum.smartsworld.ru --source-dir ./dev",
     "build": "webpack --mode production --progress",
     "lint": "eslint --ext.js src"
   },
