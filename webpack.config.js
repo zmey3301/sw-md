@@ -106,13 +106,13 @@ module.exports = (env, argv) => {
       }),
       new ZIP({
         path: bundle,
-        filename: `${pkg.name}.zip`
+        filename: `${pkg.name}-${pkg.version}.zip`
       }),
       new CRX({
         keyFile: keyFile,
         contentPath: 'dist',
         outputPath: bundle,
-        name: pkg.name
+        name: `${pkg.name}-${pkg.version}`
       })
     ])
   }
