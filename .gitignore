@@ -82,3 +82,4 @@ node_modules
 /dist
 /dev
 /bundle
+yarn-error.log

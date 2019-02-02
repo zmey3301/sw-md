@@ -1,13 +1,16 @@
+const rm = require('rimraf')
+const fs = require('fs')
 const path = require('path')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
-const DropConsolePlugin = require('drop-console-webpack-plugin')
+const RunAfterBuildPlugin = require('webpack-run-after-build-plugin')
+const TerserPlugin = require('terser-webpack-plugin')
+const WebExt = require('web-ext')
 const CRX = require('crx-webpack-plugin')
 const ZIP = require('zip-webpack-plugin')
 const pkg = require('./package')
 module.exports = (env, argv) => {
   const dist = path.resolve(__dirname,  argv.mode === 'production' ? 'dist' : 'dev')
-  const bundle = path.resolve(__dirname, 'bundle')
   const filename = 'index.js'
   let config = {
     entry: ['./src/index.js', './src/assets/sass/style.sass'],
@@ -39,12 +42,24 @@ module.exports = (env, argv) => {
           use: [
             MiniCssExtractPlugin.loader,
             'css-loader',
+            'postcss-loader',
             {
               loader: 'sass-loader',
               options: {indentedSyntax: true}
             }
           ]
         }
+      ],
+    },
+    optimization: {
+      minimizer: [
+        new TerserPlugin({
+          terserOptions: {
+            compress: {
+              drop_console: true,
+            },
+          },
+        }),
       ],
     },
     plugins: [
@@ -72,16 +87,31 @@ module.exports = (env, argv) => {
     ]
   }
   if (argv.mode === 'production') {
+    const keyDir = path.resolve(process.env.HOME, "Keys")
+    const keyFile = path.resolve(keyDir, `${pkg.name}.pem`)
+    const apiFile = path.resolve(keyDir, `${pkg.name}-mozilla.json`)
+    if (!fs.existsSync(keyFile) || !fs.existsSync(apiFile)) throw new Error("Keyfiles not found!")
+    const bundle = path.resolve(__dirname, 'bundle')
+    if (!fs.existsSync(bundle))
+      fs.mkdirSync(bundle)
+    else
+      for (const file of fs.readdirSync(bundle)) rm.sync(path.resolve(bundle, file))
     config.plugins.push(...[
-      new DropConsolePlugin(),
+      new RunAfterBuildPlugin(() => {
+        WebExt.default.cmd.sign({
+          sourceDir: dist,
+          artifactsDir: bundle,
+          ...require(apiFile)
+        }, {shouldExitProgram: false})
+      }),
       new ZIP({
         path: bundle,
         filename: `${pkg.name}.zip`
       }),
       new CRX({
-        keyFile: path.join(process.env.HOME, `${pkg.name}.pem`),
+        keyFile: keyFile,
         contentPath: 'dist',
-        outputPath: path.resolve(bundle, 'chrome'),
+        outputPath: bundle,
         name: pkg.name
       })
     ])
